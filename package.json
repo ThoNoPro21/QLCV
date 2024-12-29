@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  },
+  "scripts": {
+    "tailwind": "npx tailwindcss -i ./resources/css/style.css -o ./public/css/style.css --watch",
+    "serve": "php artisan serve",
+    "dev": "npm run tailwind & npm run serve"
+  }
+}
