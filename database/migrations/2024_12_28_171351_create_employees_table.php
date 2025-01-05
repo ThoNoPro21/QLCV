@@ -20,8 +20,8 @@ return new class extends Migration
             $table->unsignedInteger('SubsciptionID');
             $table->foreign('SubsciptionID')->references('SubsciptionID')->on('subscription')
                 ->onUpdate('cascade')->onDelete('cascade');
-            $table->unsignedBigInteger('AccountID');
-            $table->foreign('AccountID')->references('AccountID')->on('account')
+            $table->unsignedBigInteger('userId');
+            $table->foreign('userId')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
