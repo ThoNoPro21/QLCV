@@ -29,28 +29,27 @@ class GoogleController extends Controller
             $getInfo = Socialite::driver('google')->stateless()->user();
             $user = $this->createUser($getInfo);
 
-            Auth::login($user);
-
-            return response()->json([
-                'status' => __('google sign in successful'),
-                'data' => $user,
-            ], Response::HTTP_CREATED);
-
-
+            if ($user) {
+                Auth::login($user);
+                return response()->json([
+                    'success' => true,
+                    'token' => $user->createToken($user->google_id)->plainTextToken,
+                    'status' => __('google sign in successful'),
+                ]);
+            }
+          
         } catch (\Exception $exception) {
             return response()->json([
+                'success' => false,
                 'status' => __('google sign in failed'),
                 'error' => $exception,
                 'message' => $exception->getMessage()
-            ], Response::HTTP_BAD_REQUEST);
+            ],);
         }
     }
     function createUser($getInfo)
     {
         $user = User::where('google_id', $getInfo->id)->first();
-        if ($user) {
-            throw new \Exception(__('google sign in email existed'));
-        }
         if (!$user) {
             $user = User::updateOrCreate([
                 'google_id' => $getInfo->getId(),
