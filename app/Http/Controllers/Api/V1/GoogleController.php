@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,7 +17,11 @@ class GoogleController extends Controller
     public function redirect()
     {
         try {
-            return Socialite::driver('google')->redirect();
+            return Socialite::driver('google') ->stateless() ->scopes([
+                'profile', 
+                'https://www.googleapis.com/auth/user.birthday.read', 
+                'https://www.googleapis.com/auth/user.addresses.read'
+            ])->redirect();
         } catch (\Exception $exception) {
             return $exception;
         }
@@ -40,7 +45,7 @@ class GoogleController extends Controller
           
         } catch (\Exception $exception) {
             return response()->json([
-                'success' => false,
+                'success' => $user,
                 'status' => __('google sign in failed'),
                 'error' => $exception,
                 'message' => $exception->getMessage()
@@ -49,6 +54,8 @@ class GoogleController extends Controller
     }
     function createUser($getInfo)
     {
+        $birthDate = $getInfo['birthday'] ?? null; // Ngày sinh (nếu có)
+        $address = $getInfo['addresses'][0]['formattedValue'] ?? null; // Địa chỉ (nếu có)
         $user = User::where('google_id', $getInfo->id)->first();
         if (!$user) {
             $user = User::updateOrCreate([
@@ -58,6 +65,14 @@ class GoogleController extends Controller
                 'email' => $getInfo->getEmail(),
                 'avatar' => $getInfo->getAvatar(),
                 'password' => 'password'
+            ]);
+            Employee::updateOrCreate([
+                'userId' => $user->id,
+            ], [
+                'Address' => $address,
+                'Dateofbirth' => $birthDate,
+                'Role' => 'user',
+                'SubsciptionID' =>1
             ]);
         }
         return $user;
