@@ -15,6 +15,24 @@ class ProjectController extends Controller
     public function index()
     {
         //
+        try {
+            // Lấy tất cả các dự án
+            $projects = Project::all();
+    
+            // Trả về danh sách dự án
+            return response()->json([
+                'success' => true,
+                'message' => 'Lấy danh sách dự án thành công!',
+                'data' => $projects,
+            ], 200);
+        } catch (\Exception $e) {
+            // Xử lý lỗi
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi lấy danh sách dự án!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
