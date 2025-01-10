@@ -17,11 +17,7 @@ class GoogleController extends Controller
     public function redirect()
     {
         try {
-            return Socialite::driver('google') ->stateless() ->scopes([
-                'profile', 
-                'https://www.googleapis.com/auth/user.birthday.read', 
-                'https://www.googleapis.com/auth/user.addresses.read'
-            ])->redirect();
+            return Socialite::driver('google') ->stateless() ->redirect();
         } catch (\Exception $exception) {
             return $exception;
         }
@@ -45,7 +41,7 @@ class GoogleController extends Controller
           
         } catch (\Exception $exception) {
             return response()->json([
-                'success' => $user,
+                'success' => false,
                 'status' => __('google sign in failed'),
                 'error' => $exception,
                 'message' => $exception->getMessage()
@@ -54,8 +50,6 @@ class GoogleController extends Controller
     }
     function createUser($getInfo)
     {
-        $birthDate = $getInfo['birthday'] ?? null; // Ngày sinh (nếu có)
-        $address = $getInfo['addresses'][0]['formattedValue'] ?? null; // Địa chỉ (nếu có)
         $user = User::where('google_id', $getInfo->id)->first();
         if (!$user) {
             $user = User::updateOrCreate([
@@ -69,8 +63,8 @@ class GoogleController extends Controller
             Employee::updateOrCreate([
                 'userId' => $user->id,
             ], [
-                'Address' => $address,
-                'Dateofbirth' => $birthDate,
+                'Address' => '123 Lê Duẫn',
+                'Dateofbirth' => '2001-11-21',
                 'Role' => 'user',
                 'SubsciptionID' =>1
             ]);

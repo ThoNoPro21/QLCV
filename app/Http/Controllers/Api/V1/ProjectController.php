@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -24,14 +25,12 @@ class ProjectController extends Controller
         
         $validated = $request->validate([
             'ProjectName' => 'required|max:255',
-            'Role' => 'required|in:manager,user',
-            'EmployeeID' => 'required',
+            'EmployeeID' => 'required|numeric',
         ], [
             'ProjectName.required' => 'Không được bỏ trống !',
-            'EmployeeID.max' => 'Tối đa 255 kí tự!',
-            'Role.required' => 'Không được bỏ trống !',
-            'Role.in' => 'Chỉ có thể là manager hoặc user',
+            'ProjectName.max' => 'Tối đa 255 kí tự!',
             'EmployeeID.required' => 'Không được bỏ trống !',
+            'EmployeeID.numeric' => 'Phải là 1 số !',
             ]);
 
             try {            
@@ -76,9 +75,55 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request,string $id)
     {
         //
+        $validated = $request->validate([
+            'ProjectName' => [
+                'required',
+                'max:255',
+                Rule::unique('projects', 'ProjectName')->ignore($id,'ProjectID'), // Kiểm tra unique nhưng bỏ qua bản ghi hiện tại
+            ],
+            'EmployeeID' => 'required|numeric',
+        ], [
+            'ProjectName.required' => 'Không được bỏ trống!',
+            'ProjectName.max' => 'Tối đa 255 kí tự!',
+            'ProjectName.unique' => 'Tên dự án đã tồn tại!',
+            'EmployeeID.required' => 'Không được bỏ trống!',
+            'EmployeeID.numeric' => 'Phải là một số!',
+        ]);
+
+        try {            
+            // Tìm bản ghi cần cập nhật
+            $project = Project::where('ProjectID',$id)->first();
+
+            // Kiểm tra xem EmployeeID có phải là người tạo dự án hay không
+            if ($project->EmployeeID !==(int) $request['EmployeeID']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bạn không có quyền sửa dự án này!',
+                ], 403);
+            }
+
+            // Cập nhật dữ liệu
+            $project->update([
+                'ProjectName' => $validated['ProjectName'],
+            ]);
+
+            // Trả về phản hồi
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật thành công!',
+                'data' => $project,
+            ], 200);
+        } catch (\Exception $e) {
+            // Return error response if saving fails
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi sửa dữ liệu!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -92,8 +137,41 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function delete(string $id)
     {
-        //
+        try {
+            // Kiểm tra ID có hợp lệ không (có phải là số không)
+            if (!is_numeric($id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ID không hợp lệ!',
+                ], 400);
+            }
+    
+            // Tìm bản ghi dự án cần xóa
+            $project = Project::find($id);
+    
+            // Kiểm tra bản ghi có tồn tại hay không
+            if (!$project) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dự án không tồn tại!',
+                ], 404);
+            }
+    
+            // Xóa bản ghi
+            $project->delete();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Xóa dự án thành công!',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lỗi khi xóa dự án!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
