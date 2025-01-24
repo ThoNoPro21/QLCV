@@ -32,11 +32,12 @@ class GoogleController extends Controller
 
             if ($user) {
                 Auth::login($user);
-                return response()->json([
-                    'success' => true,
-                    'token' => $user->createToken($user->google_id)->plainTextToken,
-                    'status' => __('google sign in successful'),
-                ]);
+                return redirect()->away('http://localhost:3000?token=' .$user->createToken($user->google_id)->plainTextToken);
+                // return response()->json([
+                //     'success' => true,
+                //     'token' => $user->createToken($user->google_id)->plainTextToken,
+                //     'status' => __('google sign in successful'),
+                // ]);
             }
           
         } catch (\Exception $exception) {
