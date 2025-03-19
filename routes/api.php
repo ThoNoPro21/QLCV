@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\GoogleController;
 use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\StatusTaskController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
+use App\Http\Controllers\Api\V1\TaskCardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,8 +18,9 @@ Route::get('/redirect', [GoogleController::class, 'redirect']);
 Route::get('/callback', [GoogleController::class, 'loginCallback']);
 
 // Project
+Route::post('/project/create',[ProjectController::class, 'create']); //Create project
 
-Route::middleware(['auth:sanctum'])->post('/project/create',[ProjectController::class, 'create']); //Create project
+// Route::middleware(['auth:sanctum'])->post('/project/create',[ProjectController::class, 'create']); //Create project
 Route::middleware(['auth:sanctum'])->patch('/project/edit/{id}',[ProjectController::class, 'edit']); //Edit project
 Route::middleware(['auth:sanctum'])->delete('/project/delete/{id}',[ProjectController::class, 'delete']); //Delete project
 Route::middleware(['auth:sanctum'])->get('/project/index',[ProjectController::class, 'index']); //Get all project
@@ -30,6 +32,9 @@ Route::middleware(['auth:sanctum'])->delete('/statusTask/delete/{id}',[StatusTas
 Route::middleware(['auth:sanctum'])->get('/statusTask/project/{id}',[StatusTaskController::class, 'index']); //Get StatusTask theo project
 
 
+Route::middleware(['auth:sanctum'])->post('/taskCard/create',[TaskCardController::class, 'create']); //Create TaskCard
+Route::middleware(['auth:sanctum'])->patch('/taskCard/edit/{id}',[TaskCardController::class, 'edit']); //Edit TaskCard
+Route::middleware(['auth:sanctum'])->delete('/taskCard/delete/{id}',[TaskCardController::class, 'delete']); //Delete TaskCard
 
 
 //Subscription

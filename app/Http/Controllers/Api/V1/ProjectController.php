@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,13 +18,24 @@ class ProjectController extends Controller
         //
         try {
             // Lấy tất cả các dự án
-            $projects = Project::all();
-    
+            $userId = auth()->id();
+            $employee = Employee::where('userId', $userId)->first();
+            
+            if (!$employee) {
+                return response()->json(['success' => false, 'message' => 'Không tìm thấy nhân viên']);
+            }
+            
+            $createdProjects = $employee->createdProjects; 
+            $joinedProjects = $employee->projects; 
+        
+            // Gộp tất cả dự án vào một mảng chung
+            $allProjects = $createdProjects->merge($joinedProjects);
+            
             // Trả về danh sách dự án
             return response()->json([
                 'success' => true,
                 'message' => 'Lấy danh sách dự án thành công!',
-                'data' => $projects,
+                'data' => $allProjects,
             ], 200);
         } catch (\Exception $e) {
             // Xử lý lỗi
@@ -40,7 +52,6 @@ class ProjectController extends Controller
      */
     public function create(Request $request)
     {
-        
         $validated = $request->validate([
             'ProjectName' => 'required|max:255',
             'EmployeeID' => 'required|numeric',

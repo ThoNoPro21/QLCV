@@ -16,4 +16,15 @@ class Employee extends Model
         'SubsciptionID',
         'userId',
     ];
+
+    public function createdProjects()
+    {
+        return $this->hasMany(Project::class, 'EmployeeID', 'EmployeeID');
+    }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_members', 'EmployeeID', 'ProjectID')
+                    ->withPivot('Role', 'created_at');
+    }
 }

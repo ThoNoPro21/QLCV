@@ -21,4 +21,14 @@ class Project extends Model
         'Status' => '0',
         'Background' =>'none'
     ];
+    public function owner()
+    {
+        return $this->belongsTo(Employee::class, 'EmployeeID', 'EmployeeID');
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(Employee::class, 'project_members', 'ProjectID', 'EmployeeID')
+                    ->withPivot('Role', 'created_at');
+    }
 }

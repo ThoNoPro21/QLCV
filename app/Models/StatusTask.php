@@ -13,4 +13,8 @@ class StatusTask extends Model
         'StatusName',
         'ProjectID',
     ];
+    public function taskCards()
+    {
+        return $this->hasMany(TaskCard::class, 'StatustTaskID', 'StatustTaskID');
+    }
 }

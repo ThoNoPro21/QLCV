@@ -3,33 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use App\Models\StatusTask;
+use App\Models\TaskCard;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
-class StatusTaskController extends Controller
+class TaskCardController extends Controller
 {
-    //
+    
     public function index(string $id)
     {
         //
-            $statusTask =StatusTask::where('ProjectID',$id) ->with('taskCards')->get();
-            try {
     
-            // Trả về danh sách dự án
-            return response()->json([
-                'success' => true,
-                'message' => 'Lấy danh sách trạng thái Task thành công!',
-                'data' => $statusTask,
-            ], 200);
-        } catch (\Exception $e) {
-            // Xử lý lỗi
-            return response()->json([
-                'success' => false,
-                'message' => 'Lỗi khi lấy danh sách trạng thái Task!',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
     }
 
     /**
@@ -38,23 +21,26 @@ class StatusTaskController extends Controller
     public function create(Request $request)
     {
         $validated = $request->validate([
-            'StatusName' => 'required|max:255',
-            'ProjectID' => 'required|numeric|min:0',
+            'TaskCardName' => 'required|max:255',
+            'StatustTaskID' => 'required|numeric|min:0',
+            'EmployeeID' => 'required|numeric|min:0',
         ], [
-            'StatusName.required' => 'Không được bỏ trống !',
-            'StatusName.max' => 'Tối đa 255 kí tự!',
-            'ProjectID.required' => 'Không được bỏ trống !',
-            'ProjectID.numeric' => 'Phải là 1 số',
-    
+            'TaskCardName.required' => 'Không được bỏ trống !',
+            'TaskCardName.max' => 'Tối đa 255 kí tự!',
+            'StatustTaskID.required' => 'Không được bỏ trống !',
+            'StatustTaskID.numeric' => 'Phải là 1 số',
+            'EmployeeID.required' => 'Không được bỏ trống !',
+            'EmployeeID.numeric' => 'Phải là 1 số',
         ]);
 
         try {            
-            $statusTask = new StatusTask();
+            $taskCard = new TaskCard();
 
-            $statusTask->StatusName = $request->StatusName;
-            $statusTask->ProjectID = $request->ProjectID;
+            $taskCard->TaskCardName = $request->TaskCardName;
+            $taskCard->StatustTaskID = $request->StatustTaskID;
+            $taskCard->EmployeeID = $request->EmployeeID;
 
-            $statusTask->save();
+            $taskCard->save();
             return response() -> json([
                 'success' => true,
                 'message' => 'Thành công !']);
@@ -88,27 +74,28 @@ class StatusTaskController extends Controller
         //
          //
          $validated = $request->validate([
-            'StatusName' => [
+            'TaskCardName' => [
                 'required',
                 'max:255',
-                Rule::unique('statustask', 'StatusName')->ignore($id,'StatustTaskID'), // Kiểm tra unique nhưng bỏ qua bản ghi hiện tại
             ],
-            'ProjectID' => 'required|numeric',
+            'StatustTaskID' => 'required|numeric',
+            'EmployeeID' => 'required|numeric',
         ], [
-            'StatusName.required' => 'Không được bỏ trống!',
-            'StatusName.max' => 'Tối đa 255 kí tự!',
-            'StatusName.unique' => 'Tên trạng thái đã tồn tại!',
-            'ProjectID.required' => 'Không được bỏ trống!',
-            'ProjectID.numeric' => 'Phải là một số!',
+            'TaskCardName.required' => 'Không được bỏ trống!',
+            'TaskCardName.max' => 'Tối đa 255 kí tự!',
+            'StatustTaskID.required' => 'Không được bỏ trống!',
+            'StatustTaskID.numeric' => 'Phải là một số!',
+            'EmployeeID.required' => 'Không được bỏ trống!',
+            'EmployeeID.numeric' => 'Phải là một số!',
         ]);
 
         try {            
             // Tìm bản ghi cần cập nhật
-            $statusTask = StatusTask::where('StatustTaskID',$id)->first();
+            $taskCard = TaskCard::where('TaskCardID',$id)->first();
 
             // Cập nhật dữ liệu
-            $statusTask->update([
-                'StatusName' => $validated['StatusName'],
+            $taskCard->update([
+                'TaskCardName' => $validated['TaskCardName'],
             ]);
 
             // Trả về phản hồi
@@ -150,30 +137,29 @@ class StatusTaskController extends Controller
             }
     
             // Tìm bản ghi dự án cần xóa
-            $statusTask = StatusTask::find($id);
+            $taskCard = TaskCard::find($id);
     
             // Kiểm tra bản ghi có tồn tại hay không
-            if (!$statusTask) {
+            if (!$taskCard) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Trạng thái Task không tồn tại!',
+                    'message' => 'Thẻ không tồn tại!',
                 ], 404);
             }
     
             // Xóa bản ghi
-            $statusTask->delete();
+            $taskCard->delete();
     
             return response()->json([
                 'success' => true,
-                'message' => 'Xóa trạng thái thành công!',
+                'message' => 'Xóa thẻ thành công!',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Lỗi khi xóa trạng thái task!',
+                'message' => 'Lỗi khi xóa thẻ task!',
                 'error' => $e->getMessage(),
             ], 500);
         }
     }
-
 }
