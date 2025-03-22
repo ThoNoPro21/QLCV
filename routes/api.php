@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\StatusTaskController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TaskCardController;
+use App\Http\Controllers\Api\v1\TaskCardDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,10 +32,16 @@ Route::middleware(['auth:sanctum'])->patch('/statusTask/edit/{id}',[StatusTaskCo
 Route::middleware(['auth:sanctum'])->delete('/statusTask/delete/{id}',[StatusTaskController::class, 'delete']); //Delete statusTask
 Route::middleware(['auth:sanctum'])->get('/statusTask/project/{id}',[StatusTaskController::class, 'index']); //Get StatusTask theo project
 
-
+//TaskCard
 Route::middleware(['auth:sanctum'])->post('/taskCard/create',[TaskCardController::class, 'create']); //Create TaskCard
 Route::middleware(['auth:sanctum'])->patch('/taskCard/edit/{id}',[TaskCardController::class, 'edit']); //Edit TaskCard
 Route::middleware(['auth:sanctum'])->delete('/taskCard/delete/{id}',[TaskCardController::class, 'delete']); //Delete TaskCard
+
+//TaskCardDetail
+Route::middleware(['auth:sanctum'])->post('/taskCardDetail/create',[TaskCardDetailController::class, 'create']); //Create TaskCardDetail
+Route::middleware(['auth:sanctum'])->patch('/taskCardDetail/edit/{id}',[TaskCardDetailController::class, 'edit']); //Edit TaskCardDetail
+Route::middleware(['auth:sanctum'])->delete('/taskCardDetail/delete/{id}',[TaskCardDetailController::class, 'delete']); //Delete TaskCardDetail
+
 
 
 //Subscription

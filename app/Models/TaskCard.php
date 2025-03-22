@@ -18,4 +18,8 @@ class TaskCard extends Model
     {
         return $this->belongsTo(StatusTask::class, 'StatustTaskID', 'StatusTaskID');
     }
+    public function taskCardDetail()
+    {
+        return $this->belongsTo (TaskCardDetail::class, 'TaskCardID', 'TaskCardID');
+    }
 }
