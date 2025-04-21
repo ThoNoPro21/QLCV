@@ -46,7 +46,7 @@ class GoogleController extends Controller
                 'status' => __('google sign in failed'),
                 'error' => $exception,
                 'message' => $exception->getMessage()
-            ],);
+            ]);
         }
     }
     function createUser($getInfo)

@@ -5,13 +5,19 @@ use App\Http\Controllers\Api\V1\ProjectController;
 use App\Http\Controllers\Api\V1\StatusTaskController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TaskCardController;
-use App\Http\Controllers\Api\v1\TaskCardDetailController;
+use App\Http\Controllers\Api\V1\TaskCardDetailController;
+use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Get info user
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
+    $user= $request->user();
+    $employee = Employee::where('userId', $user->id)->first();
+    return response()->json([
+        'user' => $user,
+        'employee' => $employee,
+    ]);
 });
 
 // Google Sign In

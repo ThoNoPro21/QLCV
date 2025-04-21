@@ -26,6 +26,7 @@ class ProjectController extends Controller
             }
             
             $createdProjects = $employee->createdProjects; 
+        
             $joinedProjects = $employee->projects; 
         
             // Gộp tất cả dự án vào một mảng chung

@@ -96,6 +96,7 @@ class TaskCardController extends Controller
             // Cập nhật dữ liệu
             $taskCard->update([
                 'TaskCardName' => $validated['TaskCardName'],
+                'StatustTaskID' => $validated['StatustTaskID'],
             ]);
 
             // Trả về phản hồi
