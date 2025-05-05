@@ -53,6 +53,7 @@ class TaskCardDetailController extends Controller
             ],[
                 'Description' => $request->Description,
                 'File' => $filePath ? asset('storage/' . $filePath) : '',
+                'EmployeeID' =>$request->EmployeeID
             ]);
 
   

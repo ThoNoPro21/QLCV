@@ -4,50 +4,57 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
+use App\Models\Project;
+use App\Models\ProjectInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\GoogleProvider;
 
 
 class GoogleController extends Controller
 {
-    public function redirect()
+    public function redirect(Request $request)
     {
-        try {
-            return Socialite::driver('google') ->stateless() ->redirect();
-        } catch (\Exception $exception) {
-            return $exception;
+        $invitationToken = $request->query('invitation_token');
+        if ($invitationToken) {
+            session()->put('oauth_invitation_token', $invitationToken);
+            return Socialite::driver('google')
+                ->with(['state' => $invitationToken])
+                ->redirect();
         }
+
+        return Socialite::driver('google')->redirect();
     }
 
     public function loginCallback(Request $request)
     {
-        try {
+        $getInfo = Socialite::driver('google')->stateless()->user();
+        $user = $this->createUser($getInfo);
 
-            $getInfo = Socialite::driver('google')->stateless()->user();
-            $user = $this->createUser($getInfo);
+        if ($user) {
+            Auth::login($user,true);
+            $token = $user->createToken('google-auth')->plainTextToken;
+            $invitationToken = session()->pull('oauth_invitation_token');
 
-            if ($user) {
-                Auth::login($user);
-                return redirect()->away('http://localhost:3000?token=' .$user->createToken($user->google_id)->plainTextToken);
-                // return response()->json([
-                //     'success' => true,
-                //     'token' => $user->createToken($user->google_id)->plainTextToken,
-                //     'status' => __('google sign in successful'),
-                // ]);
+            if ($invitationToken) {
+                return redirect()->to('/accept-invite/' . $invitationToken)
+                    ->withCookie(cookie('auth_token', $invitationToken, 60, null, null, true, true));
             }
-          
-        } catch (\Exception $exception) {
-            return response()->json([
-                'success' => false,
-                'status' => __('google sign in failed'),
-                'error' => $exception,
-                'message' => $exception->getMessage()
-            ]);
+
+            return redirect()->away('http://localhost:3000?token=' . $token);
         }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Không thể tạo hoặc xác thực người dùng.'
+        ], 400);
     }
     function createUser($getInfo)
     {
@@ -59,7 +66,7 @@ class GoogleController extends Controller
                 'fullname' => $getInfo->getName(),
                 'email' => $getInfo->getEmail(),
                 'avatar' => $getInfo->getAvatar(),
-                'password' => 'password'
+                'password' => Hash::make(Str::random(16))
             ]);
             Employee::updateOrCreate([
                 'userId' => $user->id,
@@ -72,4 +79,5 @@ class GoogleController extends Controller
         }
         return $user;
     }
+
 }

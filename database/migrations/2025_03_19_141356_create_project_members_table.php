@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('EmployeeID');
             $table->foreign('EmployeeID')->references('EmployeeID')->on('Employees')
                 ->onUpdate('cascade')->onDelete('cascade');
-            $table->string('Role')->default('Member'); // Leader, Member, Viewer
+            $table->string('Role')->default('member'); // Leader, Member, Viewer
             $table->timestamps();
         });
     }

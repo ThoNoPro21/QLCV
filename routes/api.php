@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\GoogleController;
 use App\Http\Controllers\Api\V1\ProjectController;
+use App\Http\Controllers\Api\V1\ProjectInvitationController;
 use App\Http\Controllers\Api\V1\StatusTaskController;
 use App\Http\Controllers\Api\V1\SubscriptionController;
 use App\Http\Controllers\Api\V1\TaskCardController;
@@ -20,9 +21,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     ]);
 });
 
-// Google Sign In
-Route::get('/redirect', [GoogleController::class, 'redirect']);
-Route::get('/callback', [GoogleController::class, 'loginCallback']);
+
 
 // Project
 Route::post('/project/create',[ProjectController::class, 'create']); //Create project
@@ -48,7 +47,8 @@ Route::middleware(['auth:sanctum'])->post('/taskCardDetail/create',[TaskCardDeta
 Route::middleware(['auth:sanctum'])->patch('/taskCardDetail/edit/{id}',[TaskCardDetailController::class, 'edit']); //Edit TaskCardDetail
 Route::middleware(['auth:sanctum'])->delete('/taskCardDetail/delete/{id}',[TaskCardDetailController::class, 'delete']); //Delete TaskCardDetail
 
-
+// Mời tham gia
+Route::middleware(['auth:sanctum'])->post('/project/{projectId}/invite', [ProjectInvitationController::class, 'invite']);
 
 //Subscription
 

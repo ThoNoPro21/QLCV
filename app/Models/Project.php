@@ -31,4 +31,9 @@ class Project extends Model
         return $this->belongsToMany(Employee::class, 'project_members', 'ProjectID', 'EmployeeID')
                     ->withPivot('Role', 'created_at');
     }
+
+    public function invitations()
+    {
+        return $this->hasMany(ProjectInvitation::class, 'ProjectID');
+    }
 }
